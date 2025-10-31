@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI data Analyst</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen w-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+
+  <!-- Chat container (full height) -->
+  <div class="flex flex-col flex-1 bg-white shadow-md rounded-none md:rounded-xl md:m-4 overflow-hidden">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center px-6 py-4 border-b bg-white sticky top-0 z-10">
+      <div>
+        <h2 class="text-xl font-bold text-indigo-600">AI data analyst</h2>
+        <p class="text-xs text-gray-500">Your no code data analysis tool</p>
+      </div>
+      <button id="clearBtn" class="text-sm px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200">Clear</button>
+    </header>
+
+    <!-- Scrollable Chat -->
+    <main id="chatContainer" class="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-gray-50">
+      <!-- Messages render here -->
+    </main>
+
+    <!-- Input area -->
+    <footer class="border-t bg-white px-6 py-4 sticky bottom-0">
+      <form id="chatForm" class="flex items-end gap-3">
+        <textarea id="chatInput" rows="1" placeholder="Type a message..."
+          class="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          aria-label="Message input"></textarea>
+
+        <button id="sendBtn" type="submit"
+          class="inline-flex items-center px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-400 text-white font-medium hover:opacity-95">
+          Send
+        </button>
+      </form>
+    </footer>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+<script src="chat.js"></script>
+</body>
+</html>

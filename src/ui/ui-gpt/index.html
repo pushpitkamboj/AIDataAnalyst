@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connect Your Data Source</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center min-h-screen">
+
+  <!-- MAIN CARD -->
+  <div class="bg-white shadow-md rounded-2xl w-full max-w-md p-8 text-center">
+    <h1 class="text-2xl font-bold text-indigo-600">Connect Your Data Source</h1>
+    <p class="text-gray-500 mt-2 text-sm">
+      Choose how you'd like to connect your data - upload a CSV file or connect to a database
+    </p>
+
+    <!-- Buttons -->
+    <div class="flex mt-6 bg-gray-100 rounded-lg overflow-hidden text-sm font-medium">
+      <button id="csvBtn" class="flex-1 py-2 px-3 bg-white text-indigo-600 border border-gray-200 rounded-l-lg flex items-center justify-center gap-2">
+        CSV File
+      </button>
+      <button id="dbBtn" class="flex-1 py-2 px-3 text-gray-500 bg-gray-100 rounded-r-lg flex items-center justify-center gap-2">
+        Database
+      </button>
+    </div>
+
+    <!-- CSV Upload Section -->
+    <div id="csvSection" class="mt-8 text-left">
+      <label class="block font-semibold text-gray-800 mb-2">Upload CSV File</label>
+
+      <div class="flex items-center space-x-3">
+        <label class="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+          Choose File
+          <input id="fileInput" type="file" accept=".csv" class="hidden" />
+        </label>
+        <span id="fileNameText" class="text-gray-500 text-sm">No file chosen</span>
+      </div>
+
+      <button id="uploadBtn" class="w-full mt-6 bg-gradient-to-r from-indigo-500 to-purple-400 text-white py-2.5 rounded-lg font-medium hover:opacity-90 transition">
+        Upload File
+      </button>
+
+      <!-- progress / status -->
+      <div id="uploadStatus" class="mt-3 text-sm text-gray-600"></div>
+    </div>
+
+    <!-- Database Section (kept inside the same card) -->
+    <div id="dbSection" class="hidden mt-8 text-left">
+      <label class="block font-semibold text-gray-800 mb-2">Connect to Database</label>
+      <input id="dbInput" type="text" placeholder="Enter database connection string"
+             class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <button id="connectDbBtn" class="w-full mt-6 bg-gradient-to-r from-indigo-500 to-purple-400 text-white py-2.5 rounded-lg font-medium hover:opacity-90 transition">
+        <div id="dbStatus" class="mt-3 text-sm text-gray-600"></div>
+        Connect Database
+      </button>
+    </div>
+  </div>
+  <!-- END MAIN CARD -->
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
