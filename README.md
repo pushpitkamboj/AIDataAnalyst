@@ -2,6 +2,10 @@
 
 ![AI Data Analyst Banner](https://img.shields.io/badge/AI-Data%20Analyst-blueviolet?style=for-the-badge)
 
+# sample working demos
+https://youtu.be/M2rnEIAOEQg
+https://youtu.be/E_ioIjX4nzM
+
 ## Overview
 
 AI Data Analyst is an open-source platform designed to automate and enhance data analysis workflows using advanced AI agents. It enables seamless integration of data ingestion, processing, visualization, and reporting, empowering analysts and organizations to unlock actionable insights with minimal manual intervention.
@@ -60,6 +64,8 @@ python main.py
 ![AI Data Analyst Architecture](./architecture.png)
 
 for more detailed documentation, refer to https://docs.google.com/presentation/d/1Y1Hrf8_KEyrQQWmSvefEJwINP4l3rXOz/edit?usp=sharing&ouid=103413741594923457323&rtpof=true&sd=true
+
+
 
 ---
 
