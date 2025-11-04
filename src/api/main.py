@@ -1,9 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 import tempfile, os
 from supabase import create_client, Client
-SUPABASE_URL = "https://twypdtqllbeaaxkbduju.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eXBkdHFsbGJlYWF4a2JkdWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDMwMDIsImV4cCI6MjA3NTIxOTAwMn0.OcKMKcb5lWgl7-DWUzS_VyQNlQ4k4lvkMy-E04cQJTE"
-BUCKET_NAME = "data_csv"
+
 from pydantic import BaseModel
 from langgraph_sdk.client import get_client
 from langchain_core.messages import HumanMessage
@@ -29,78 +27,7 @@ client = get_client(url = "http://localhost:2024")  #langgraph
 class ReqBody(BaseModel):
     db_url: str | None = None
     query: str
-    
 
-# @app.post("/upload")
-# async def upload_data(
-#     file: UploadFile | None = File(None),
-#     db_url: str | None = Form(None),
-#     query: str = Form(...)
-# ):
-#     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-#     supabase_uploaded_path = None
-#     tmp_path = None
-#     state = None
-    
-#     req = ReqBody(db_url=db_url, query=query)
-#     try:
-#         if file and req.db_url:
-#             return {
-#                 "final_answer": "please don't upload both things, the platform is not ready yet to work for both data, we are working on it"
-#             }
-            
-#         if file:
-#             if not file.filename.lower().endswith(".csv"):
-#                 raise HTTPException(status_code=400, detail="Only CSV files are allowed")
-
-#             with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
-#                 tmp_path = tmp.name
-#                 content = await file.read() if file else None
-#                 if content:
-#                     tmp.write(content)
-                    
-#                 with open(tmp_path, "rb") as f:
-#                     res = supabase.storage.from_(BUCKET_NAME).upload(
-#                         file.filename, f, {"content-type": "text/csv"}
-#                     )
-#                     supabase_uploaded_path = res.path 
-                        
-#                 public_url = (
-#                     supabase.storage
-#                     .from_(BUCKET_NAME)
-#                     .get_public_url(supabase_uploaded_path)
-#                 )
-            
-#             state = {
-#                 "csv_url": public_url,
-#                 "messages": HumanMessage(content=req.query),
-#             }
-            
-#         elif data.db_url:
-#             state = {
-#                 "db_url": data.db_url,
-#                 "messages": HumanMessage(content=req.query)
-#             }
-#         else:
-#             return {
-#                 "final_answer": "please upload at least one of the things, connection string or csv file"
-#             }
-            
-#         thread = await client.threads.create() 
-#         run = await client.runs.wait(assistant_id="agent", thread_id=None, input=state)
-#         result = run["result"]
-        
-#         return {
-#             "final_answer": result
-#         }
-        
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"{e}")
-
-#     finally:
-#         if tmp_path and os.path.exists(tmp_path):
-#             os.remove(tmp_path)
-       
        
 DbUrl = None
 CsvUrl = None
@@ -301,24 +228,3 @@ def health():
     return{
         "message": "health is ok"
     }          
-
-# class UriBody(BaseModel):
-#     uri: str
-
-# @app.post("/upload-uri")
-# def upload_connection_string(body: UriBody):
-#     response = (
-#         supabase.table("db_url")
-#         .insert({"id": 42, "uri": body.uri})
-#         .execute()
-#     )
-#     return {"message": response}
-
-# #from this api
-
-# # connect to your deployed graph (local or cloud)
-
-
-# # update (merge) or modify state before run
-
-# print(result)
