@@ -24,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = get_client(url = "http://localhost:2024") #langgraph
+client = get_client(url = "http://localhost:2024")  #langgraph
 
 class ReqBody(BaseModel):
     db_url: str | None = None
