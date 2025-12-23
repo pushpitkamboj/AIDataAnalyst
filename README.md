@@ -62,7 +62,7 @@ python main.py
 ## Architecture
 
 ![AI Data Analyst Architecture](./architecture.png)
-![AI Data Analyst Architecture](./architecture_analyst_agent.png)
+![architecture](./architecture_analyst_agent.png)
 
 for more detailed documentation, refer to https://docs.google.com/presentation/d/1Y1Hrf8_KEyrQQWmSvefEJwINP4l3rXOz/edit?usp=sharing&ouid=103413741594923457323&rtpof=true&sd=true
 
