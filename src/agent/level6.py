@@ -10,10 +10,9 @@ from e2b_code_interpreter import Sandbox
 from dotenv import load_dotenv
 load_dotenv()
 
-project_url = os.getenv("project_url")
-api_key = os.getenv("api_key")
-
-supabase: Client = create_client(project_url, api_key)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 #LEFT NODE
 def run_query(state: State):
     """Execute SQL query on CSV or DB and return DataFrame."""

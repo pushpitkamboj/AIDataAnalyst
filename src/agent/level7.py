@@ -1,12 +1,12 @@
 import requests
 import base64
 from langchain.chat_models import init_chat_model
-from langchain.schema import SystemMessage, HumanMessage
 from .graph_state import State
 from dotenv import load_dotenv
 load_dotenv()
 from langchain.chat_models import init_chat_model
 import pandas as pd
+from langchain_core.messages import ToolMessage, AIMessage, SystemMessage, HumanMessage
 
 llm = init_chat_model("openai:gpt-4.1")
 def generate_answer_query(state: State):

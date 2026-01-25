@@ -3,14 +3,16 @@ import tempfile, os
 from supabase import create_client, Client
 
 from pydantic import BaseModel
-from langgraph_sdk.client import get_client
-from langchain_core.messages import HumanMessage
+from agent.graph import app as graph_app
 from datetime import datetime
 import uuid
 from dotenv import load_dotenv
 load_dotenv()
 from fastapi.middleware.cors import CORSMiddleware
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+BUCKET_NAME = os.getenv("BUCKET_NAME", "data_image")
 
 app = FastAPI()
 
@@ -21,8 +23,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-client = get_client(url = "http://localhost:2024")  #langgraph
 
 class ReqBody(BaseModel):
     db_url: str | None = None
@@ -189,35 +189,30 @@ class reqBody(BaseModel):
 async def query(payload: reqBody):
 
     if payload.db_url:
-        state = {
-            "db_url": payload.db_url,
-            "messages": payload.query
-        }
-        thread_id = str(uuid.uuid4())          # e.g. '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        thread = await client.threads.create(thread_id=thread_id)
-        run = await client.runs.wait(assistant_id="agent", thread_id=thread_id, input=state)
-        output_states = await client.threads.get_state(thread_id)
-
-        result = output_states["values"]["result"]
-
-        return {"message": result}
+        thread_id = str(uuid.uuid4())
+        result = await graph_app.ainvoke(
+            input={"prompt": payload.query, "db_url": payload.db_url},
+            config={"configurable": {"thread_id": thread_id}, "recursion_limit": 18}
+        )
+        if "image_urls" in result:
+            return {
+                "message": result["result"],
+                "image_urls": result["image_urls"]
+            }
+        return {"message": result["result"]}
     
     elif payload.csv_url:
-        state = {
-            "csv_url": payload.csv_url,
-            "messages": payload.query
-        }
         thread_id = str(uuid.uuid4())
-        thread = await client.threads.create(thread_id=thread_id)
-        run = await client.runs.wait(assistant_id="agent", thread_id=thread_id, input=state)
-        # result = run.get("result") if isinstance(run, dict) else getattr(run, "result", run)
-        # image_url = result.get("image_urls")
-        # if image_urls
-        # val = run.to_dict(orient="records")
-        output_states = await client.threads.get_state(thread_id)
-        
-        result = output_states["values"]["result"]
-        return {"message": result}
+        result = await graph_app.ainvoke(
+            input={"prompt": payload.query, "csv_url": payload.csv_url},
+            config={"configurable": {"thread_id": thread_id}, "recursion_limit": 18}
+        )
+        if "image_urls" in result:
+            return {
+                "message": result["result"],
+                "image_urls": result["image_urls"]
+            }
+        return {"message": result["result"]}
     
     return {
         "message": "none worked"

@@ -10,9 +10,7 @@ from langchain_community.utilities import SQLDatabase #https://python.langchain.
 # from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.tools.sql_database.tool import InfoSQLDatabaseTool
 from langchain_core.tools import tool
-from langchain_core.messages import ToolMessage, AIMessage
-from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage
+from langchain_core.messages import ToolMessage, AIMessage, SystemMessage, HumanMessage
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -109,20 +107,20 @@ agent_graph.add_edge("generate_answer_viz", END)
 
 app = agent_graph.compile()
 
-@traceable
-def main():
-    config = {"configurable": {"thread_id": "traveler_456"}, "recursion_limit": 3}
-    user_query = {"messages": [{"role": "user", "content": "give me the latest last 3 users with all there details"}], "db_url": "postgresql://blog-assignment_owner:npg_QGj8zmUExCu4@ep-red-truth-a4blfydv-pooler.us-east-1.aws.neon.tech/blog-assignment?sslmode=require&channel_binding=require"}
-    full_plan = app.invoke(user_query, config)
+# @traceable
+# def main():
+#     config = {"configurable": {"thread_id": "traveler_456"}, "recursion_limit": 3}
+#     user_query = {"messages": [{"role": "user", "content": "give me the latest last 3 users with all there details"}], "db_url": "postgresql://blog-assignment_owner:npg_QGj8zmUExCu4@ep-red-truth-a4blfydv-pooler.us-east-1.aws.neon.tech/blog-assignment?sslmode=require&channel_binding=require"}
+#     full_plan = app.invoke(user_query, config)
     
     
-from IPython.display import Image, display
-try:
-    with open("graph_arch.png", "wb") as f:
-        f.write(app.get_graph().draw_png())
-except Exception:
-    # This requires some extra dependencies and is optional
-    print("couldnt print")
+# from IPython.display import Image, display
+# try:
+#     with open("graph_arch.png", "wb") as f:
+#         f.write(app.get_graph().draw_png())
+# except Exception:
+#     # This requires some extra dependencies and is optional
+#     print("couldnt print")
     
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
