@@ -31,6 +31,7 @@ from .level4 import generate_query, data_to_sandbox
 from .level5 import check_query, generate_code
 from .level6 import run_query, run_code
 from .level7 import generate_answer_query, generate_answer_viz
+from .retry_nodes import fix_query, fix_code, should_retry_query, should_retry_code
 
 from .graph_state import State
     
@@ -64,11 +65,13 @@ agent_graph.add_node(extract_db_info)
 agent_graph.add_node(prompt_analysis) #the deciding factor to go to query conor visualization
 agent_graph.add_node(generate_code)
 agent_graph.add_node(run_code)
+agent_graph.add_node(fix_code)  # Retry node for code
 agent_graph.add_node(generate_answer_viz)
 
 agent_graph.add_node(generate_query)
 agent_graph.add_node(check_query)
 agent_graph.add_node(run_query)
+agent_graph.add_node(fix_query)  # Retry node for query
 agent_graph.add_node(generate_answer_query)
 agent_graph.add_node(data_to_sandbox)
 
@@ -84,25 +87,24 @@ def decision_fn(state: State) -> Literal["generate_query", "data_to_sandbox"]:
     
 agent_graph.add_conditional_edges("prompt_analysis", decision_fn)
 
+# SQL Query path with retry loop
 agent_graph.add_edge("generate_query", "check_query")
 agent_graph.add_edge("check_query", "run_query")
-agent_graph.add_edge("run_query", "generate_answer_query")
+agent_graph.add_conditional_edges("run_query", should_retry_query, {
+    "fix_query": "fix_query",
+    "generate_answer_query": "generate_answer_query"
+})
+agent_graph.add_edge("fix_query", "run_query")  # Loop back to retry
 agent_graph.add_edge("generate_answer_query", END)
 
+# Visualization path with retry loop
 agent_graph.add_edge("data_to_sandbox", "generate_code")
 agent_graph.add_edge("generate_code", "run_code")
-
-# def loop_code_execution(state: State) -> Literal["generate_code", "generate_answer_viz"]:
-#     if state.get("code_status") == False:
-#         return "generate_code"
-#     if state.get("code_status") == True:
-        
-#         sbx = Sandbox.connect(state["sandbox_id"])
-#         sbx.kill()
-#         return "generate_answer_viz"
-    
-# agent_graph.add_conditional_edges("run_code", loop_code_execution) #generate code OR generate answer viz
-agent_graph.add_edge("run_code", "generate_answer_viz")
+agent_graph.add_conditional_edges("run_code", should_retry_code, {
+    "fix_code": "fix_code",
+    "generate_answer_viz": "generate_answer_viz"
+})
+agent_graph.add_edge("fix_code", "run_code")  # Loop back to retry
 agent_graph.add_edge("generate_answer_viz", END)
 
 app = agent_graph.compile()

@@ -13,11 +13,15 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+MAX_RETRIES = 3
+
 #LEFT NODE
 def run_query(state: State):
     """Execute SQL query on CSV or DB and return DataFrame."""
     query = state.get("query")
     df = None
+    
     try:
         if state.get("csv_url"):
             con = duckdb.connect()
@@ -28,80 +32,66 @@ def run_query(state: State):
             df = pd.read_sql(query, db._engine)
 
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "query_error": str(e),
+            "retry_count": state.get("retry_count", 0) + 1
+        }
 
-    return {"sql_query_output": df.to_dict(orient="records")}
+    return {
+        "sql_query_output": df.to_dict(orient="records"),
+        "query_error": None
+    }
 
 #RIGHT NODE    
 import base64
 def run_code(state: State):
     sbx = Sandbox.connect(state["sandbox_id"])
-        
-    image_exist = False
-    execution = sbx.run_code(state["python_code"])
+    
+    try:
+        execution = sbx.run_code(state["python_code"])
 
-    if execution.error:
-        not_worked = AIMessage(
-            content=f"the execution of the code inside sandbox stopped due to error -> {execution.error}"
+        if execution.error:
+            return {
+                "code_error": str(execution.error),
+                "code_status": False,
+                "retry_count": state.get("retry_count", 0) + 1
+            }
+            
+        public_urls = []
+        result_idx = 0
+
+        for result in execution.results:
+            if not result.png:
+                continue
+
+            img_bytes = base64.b64decode(result.png)
+
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+            filename = f"chart-{result_idx}-{timestamp}.png"
+            path_in_bucket = f"{filename}"
+            
+            res = supabase.storage.from_("data_image").upload(path_in_bucket, img_bytes, {"content-type": "image/png"})
+            public_url = supabase.storage.from_("data_image").get_public_url(path_in_bucket)
+            public_urls.append(public_url)
+            
+            result_idx += 1
+
+        worked = AIMessage(
+            content=f"Code executed successfully. Images: {', '.join(public_urls)}"
         )
         
+        sbx.kill()
+
         return {
-            "messages": [not_worked],
-            # "code_error": [execution.error],
-            # "code_status": False
+            "messages": [worked],
+            "image_urls": public_urls,
+            "code_status": True,
+            "code_error": None
         }
         
-    # image_files = []
-    # result_idx = 0
-    # for result in execution.results:
-    #     if result.png:
-    #         file_name = f'chart-{result_idx}.png'
-    #         with open(file_name, 'wb') as f:
-    #             f.write(base64.b64decode(result.png))
-    #         print(f'Chart saved to {file_name}')
-    #         image_files.append(file_name)
-    #         result_idx += 1
-
-    # worked = AIMessage(
-    #     content=f"the code has been executed successfully by the sandbox and the resulted image file locations are: {', '.join(image_files)}"
-    # )
-
-    # return {
-    #     "messages": [worked],
-    #     "image_locations": image_files
-    # }
-    public_urls = []
-    result_idx = 0
-
-    for result in execution.results:
-        if not result.png:
-            continue
-
-        img_bytes = base64.b64decode(result.png)
-
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-        filename = f"chart-{result_idx}-{timestamp}.png"
-        path_in_bucket = f"{filename}" #in the root of the folder
-        
-        res = supabase.storage.from_("data_image").upload(path_in_bucket, img_bytes, {"content-type": "image/png"})
-
-        public_url = supabase.storage.from_("data_image").get_public_url(path_in_bucket)
-        public_urls.append(public_url)
-        
-        result_idx += 1
-
-    # Prepare message to return (similar to your original)
-    worked = AIMessage(
-        content=(
-            f"the code has been executed successfully by the sandbox and the resulted image file locations are: "
-            + ", ".join(public_urls) + f"{execution.results}"
-        )
-    )
-    
-    sbx.kill()
-
-    return {
-        "messages": [worked],
-        "image_urls": public_urls,
-        # "code_status": True
-    }
+    except Exception as e:
+        return {
+            "code_error": str(e),
+            "code_status": False,
+            "retry_count": state.get("retry_count", 0) + 1
+        }

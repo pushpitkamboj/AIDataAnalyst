@@ -24,5 +24,7 @@ class State(TypedDict):
     decision: str
     
     code_status: bool
-    code_error: List[Any]
+    code_error: str
+    query_error: str
+    retry_count: int
     
