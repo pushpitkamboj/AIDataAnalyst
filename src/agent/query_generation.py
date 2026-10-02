@@ -114,8 +114,7 @@ def data_to_sandbox(state: State): #based on data input upload csv or db
         command = f"echo 'DATABASE_URL={url}' > .env"
         sbx.commands.run(command)
         sbx.commands.run("pip install python-dotenv")
-        sbx.commands.run("pip install sqlalchemy")
-        sbx.commands.run("pip install psycopg2")
+        sbx.commands.run("pip install sqlalchemy psycopg2-binary pymysql")
         # sbx.commands.run("pip install holoviews bokeh datashader")
         ai_msg = AIMessage(content= "the connection url has been uploaded to the sandbox")
         

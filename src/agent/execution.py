@@ -2,11 +2,10 @@ import base64
 import datetime
 
 import duckdb
-import pandas as pd
 from e2b_code_interpreter import Sandbox
-from langchain_community.utilities import SQLDatabase
 from langchain_core.messages import AIMessage
 
+from utils.database import read_query
 from utils.errors import agent_retry_error
 from utils.settings import get_settings
 from utils.storage import upload_bytes
@@ -26,8 +25,7 @@ def run_query(state: State):
             with duckdb.connect() as connection:
                 df = connection.execute(query).df()
         elif state.get("db_url"):
-            db = SQLDatabase.from_uri(state["db_url"])
-            df = pd.read_sql(query, db._engine)
+            df = read_query(state["db_url"], query)
         else:
             raise ValueError("Missing csv_url or db_url")
     except Exception as exc:

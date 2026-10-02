@@ -15,14 +15,15 @@ dependencies = [
     "pandas==2.3.2",
     "duckdb>=1.4.0",
     "requests>=2.32.5",
+    "sqlalchemy>=2.0.0",
     "langchain>=0.3.27",
-    "langchain_community>=0.3.30",
     "langsmith>=0.4.31",
     "e2b-code-interpreter>=2.0.0",
     "fastapi>=0.116.2",
     "supabase>=2.21.1",
     "psycopg2-binary>=2.9.7",
-    "psycopg>=2.9.10"
+    "psycopg>=2.9.10",
+    "pymysql>=1.1.1"
 ]
 
 
