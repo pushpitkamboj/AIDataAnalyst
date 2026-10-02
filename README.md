@@ -51,6 +51,14 @@ The app starts with a simple data-source picker. Users can upload a CSV file or 
 | Visual analysis | Generates Python chart code and runs it inside an E2B sandbox. |
 | Artifact storage | Stores generated chart images in Supabase and returns public URLs. |
 
+## Why Not Just Use ChatGPT?
+
+AI Data Analyst is built for users who want the convenience of an AI analyst without handing database API keys directly to a general-purpose chat product. Secrets stay in your own deployment environment, and database access flows through this app's backend instead of being pasted into an external assistant.
+
+It is also open source, so the trust model is inspectable: you can read the code, see how uploads, database URLs, query generation, and execution are handled, and change anything that does not match your security posture.
+
+The product UX is purpose-built for data analysis. Instead of a generic chat upload flow, the app separates CSV/database connection, schema extraction, query answering, visualization, and artifact storage. It can also work with large CSV files, including million-row datasets, where general chat tools often hit upload or context limits.
+
 ## Architecture
 
 <p align="center">
