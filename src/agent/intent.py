@@ -1,14 +1,21 @@
-from pydantic import BaseModel
 from typing import Literal
+
 from langchain.chat_models import init_chat_model
-from .graph_state import State
-from .level4 import data_to_sandbox, generate_query
-from langgraph.types import Command
 from langchain_core.messages import AIMessage
+from pydantic import BaseModel
+
+from utils.settings import get_settings
+
+from .graph_state import State
+
+get_settings().apply_to_environment()
 
 llm = init_chat_model("openai:gpt-4.1")
-class prompt_decision(BaseModel):
+
+
+class PromptDecision(BaseModel):
     analysis_type: Literal["sql", "visualization"]
+
 
 def prompt_analysis(state: State):
     prompt = """
@@ -18,7 +25,7 @@ def prompt_analysis(state: State):
     2) compare the salaries of male and female employees who based on different city offices -> best reply to this query is through data visualization
     """
     
-    structured_llm = llm.with_structured_output(prompt_decision)
+    structured_llm = llm.with_structured_output(PromptDecision)
     response = structured_llm.invoke(state["messages"] + [{"role": "system", "content": prompt}])
     analysis_type = response.analysis_type
     
@@ -27,7 +34,7 @@ def prompt_analysis(state: State):
     )
     
     return {
-        "message": [ai_msg],
+        "messages": [ai_msg],
         "decision": analysis_type
     }
     

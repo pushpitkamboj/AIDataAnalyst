@@ -154,7 +154,7 @@ async function echoResponse(userText) {
     }
 
     // POST to your API. Change host/port if needed.
-    const resp = await axios.post("http://127.0.0.1:8000/query", payload, { timeout: 900000 });
+    const resp = await axios.post("/query", payload, { timeout: 900000 });
 
     // Remove typing indicator
     chatHistory = chatHistory.filter(m => !m.temp);

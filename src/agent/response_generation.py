@@ -1,12 +1,14 @@
-import requests
 import base64
+
+import requests
 from langchain.chat_models import init_chat_model
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from utils.settings import get_settings
+
 from .graph_state import State
-from dotenv import load_dotenv
-load_dotenv()
-from langchain.chat_models import init_chat_model
-import pandas as pd
-from langchain_core.messages import ToolMessage, AIMessage, SystemMessage, HumanMessage
+
+get_settings().apply_to_environment()
 
 llm = init_chat_model("openai:gpt-4.1")
 def generate_answer_query(state: State):
@@ -36,7 +38,7 @@ def generate_answer_viz(state: State):
             "image_url": {"url": f"data:{ct};base64,{b64}"}
         })
 
-    system_msg = SystemMessage(content=f"You are a data analyst. Inspect the provided chart images and return with a good summarized paragraph about it, the content should be purely human readable with no mdx or any other syntax. If no images are found in ur context, politely reply that couldn't generate the image")
+    system_msg = SystemMessage(content="You are a data analyst. Inspect the provided chart images and return with a good summarized paragraph about it, the content should be purely human readable with no mdx or any other syntax. If no images are found in ur context, politely reply that couldn't generate the image")
     human_msg = HumanMessage(content=[{"type":"text","text":"Analyze these charts:"}] + image_parts)
 
     resp = model.invoke([system_msg, human_msg])

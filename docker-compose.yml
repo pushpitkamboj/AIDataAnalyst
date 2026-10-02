@@ -1,0 +1,36 @@
+services:
+  aidataanalyst:
+    build:
+      context: .
+    container_name: aidataanalyst
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      E2B_API_KEY: ${E2B_API_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      CSV_BUCKET_NAME: ${CSV_BUCKET_NAME:-data_csv}
+      IMAGE_BUCKET_NAME: ${IMAGE_BUCKET_NAME:-data_image}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: aidataanalyst-caddy
+    restart: unless-stopped
+    depends_on:
+      - aidataanalyst
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-aidataanalyst.pushpitkamboj.com}
+    command: caddy reverse-proxy --from ${DOMAIN:-aidataanalyst.pushpitkamboj.com} --to aidataanalyst:8000
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

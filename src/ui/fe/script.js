@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setStatus("Starting upload...");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/upload", form, {
+      const response = await axios.post("/upload", form, {
         // Let axios set Content-Type and boundary for FormData
         onUploadProgress: (progressEvent) => {
           if (progressEvent.lengthComputable) {

@@ -1,72 +1,78 @@
 # AI Data Analyst
 
-![AI Data Analyst Banner](https://img.shields.io/badge/AI-Data%20Analyst-blueviolet?style=for-the-badge)
+AI Data Analyst is a no-code data analysis app for querying CSV files or databases in plain English. It uploads CSVs to Supabase, inspects the dataset schema, chooses whether the request needs SQL or visualization, and returns tables, chart images, or short natural-language summaries.
 
-# sample working demos
-https://youtu.be/M2rnEIAOEQg
-https://youtu.be/E_ioIjX4nzM
+## What It Does
 
-## Overview
-
-AI Data Analyst is an open-source platform designed to automate and enhance data analysis workflows using advanced AI agents. It enables seamless integration of data ingestion, processing, visualization, and reporting, empowering analysts and organizations to unlock actionable insights with minimal manual intervention.
-
----
-
-## Features
-
-- **Automated Data Ingestion**: Effortlessly import CSV, database, and API data sources.
-- **Intelligent Analysis**: Leverage AI agents for statistical analysis, anomaly detection, and predictive modeling.
-- **Natural Language Queries**: Interact with your data using conversational AI.
-- **Visualization**: Generate beautiful charts and dashboards.
-- **Extensible Architecture**: Modular agent system for custom workflows.
-- **Secure & Scalable**: Enterprise-ready with environment-based configuration and robust backend.
-
----
-
-## Getting Started
-
-### Prerequisites
-- Python 3.11+
-- `pip`
-### Installation
-
-```bash
-# Clone the repository
-$ git clone https://github.com/pushpitkamboj/AIDataAnalyst
-$ cd AIDataAnalyst
-
-# Install dependencies
-$ pip install -r pyproject.toml
-```
-
-### Configuration
-
-Copy `.env.example` to `.env` and update the values as needed:
-
-```bash
-cp .env.example .env
-```
-
----
-
-## Usage
-
-Run the main agent:
-
-```bash
-python main.py
-```
-
----
+- Upload a CSV file or provide a database connection string.
+- Ask questions in natural language.
+- Generate SQL for tabular answers.
+- Generate Python chart code in an E2B sandbox for visual analysis.
+- Store generated chart images in Supabase and return public URLs.
 
 ## Architecture
 
-![AI Data Analyst Architecture](./architecture.png)
-![architecture](./architecture_analyst_agent.png)
+```text
+Browser UI
+  -> FastAPI routes
+     -> /upload stores CSV files in Supabase
+     -> /query invokes the LangGraph analyst agent
 
-for more detailed documentation, refer to https://docs.google.com/presentation/d/1Y1Hrf8_KEyrQQWmSvefEJwINP4l3rXOz/edit?usp=sharing&ouid=103413741594923457323&rtpof=true&sd=true
+LangGraph analyst agent
+  -> routes CSV vs database input
+  -> extracts schema and sample metadata
+  -> classifies request as SQL or visualization
+  -> generates and checks SQL, or generates Python chart code
+  -> executes SQL locally/DuckDB or code in E2B
+  -> returns rows, chart URLs, and summaries
 
+External services
+  -> OpenAI for reasoning and code/query generation
+  -> Supabase for CSV and image storage
+  -> E2B for sandboxed visualization execution
+```
 
+## Local Setup
 
----
+Requires Python 3.11+.
 
+```bash
+git clone https://github.com/pushpitkamboj/AIDataAnalyst
+cd AIDataAnalyst
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Create `.env`:
+
+```env
+OPENAI_API_KEY=
+E2B_API_KEY=
+SUPABASE_URL=
+SUPABASE_KEY=
+CSV_BUCKET_NAME=data_csv
+IMAGE_BUCKET_NAME=data_image
+```
+
+Run the app:
+
+```bash
+PYTHONPATH=src uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+## License
+
+MIT

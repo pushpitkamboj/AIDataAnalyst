@@ -1,13 +1,18 @@
-from .graph_state import State
-from typing_extensions import TypedDict
-from typing import Annotated
-from langchain_core.messages import AIMessage
 from langchain.chat_models import init_chat_model
+from langchain_core.messages import AIMessage
+from typing import Annotated
+from typing_extensions import TypedDict
+
+from utils.settings import get_settings
+
+from .graph_state import State
+
+get_settings().apply_to_environment()
 
 llm = init_chat_model("openai:gpt-4.1")
 
 #RIGHT NODE
-class code_format(TypedDict):
+class GeneratedCode(TypedDict):
     code: Annotated[str, ..., "the python code to run"] 
     
 def generate_code(state: State):
@@ -84,7 +89,7 @@ def generate_code(state: State):
             After this, Write Python code that analyzes the dataset based on the user's request and produces right charts/graphs/visuals accordingly
         """
     
-    structured_llm = llm.with_structured_output(code_format)
+    structured_llm = llm.with_structured_output(GeneratedCode)
     response = structured_llm.invoke([{"role": "system", "content": viz_system_prompt}] + state["messages"])
     
     ai_message_code = AIMessage(
@@ -121,7 +126,7 @@ def check_prompt(state: State):
         dialect=state["dialect"],
     )
     
-class QueryOutput(TypedDict):
+class CheckedQuery(TypedDict):
     """Generated SQL query."""
     query: str
     
@@ -130,7 +135,7 @@ def check_query(state: State):
         "role": "system",
         "content": check_prompt(state),
     }
-    structured_llm = llm.with_structured_output(QueryOutput)
+    structured_llm = llm.with_structured_output(CheckedQuery)
     response = structured_llm.invoke([state["query"]] + [system_message])
     
     ai_msg = AIMessage(

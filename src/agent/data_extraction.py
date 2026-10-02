@@ -1,16 +1,18 @@
-
-from .graph_state import State
-import os
-from supabase import create_client, Client
 import pandas as pd
 from langchain_core.messages import AIMessage
-from sqlalchemy import create_engine, inspect, MetaData
+from sqlalchemy import MetaData, create_engine, inspect
+
+from utils.logging import get_logger
+
+from .graph_state import State
+
+logger = get_logger(__name__)
 
 
 def extract_db_info(state: State):
     """Extract database schema metadata using SQLAlchemy."""
     url = state.get("db_url")
-    print(f"the url is: {url}")
+    logger.info("Extracting database metadata")
     
     engine = create_engine(url)
     inspector = inspect(engine)
@@ -67,9 +69,9 @@ def extract_db_info(state: State):
         # Detect dialect from engine
         dialect = engine.dialect.name
         
-    except Exception as e:
-        print(f"Error extracting DB schema: {e}")
-        schema_context = {"error": str(e)}
+    except Exception as exc:
+        logger.exception("Error extracting database schema")
+        schema_context = {"error": str(exc)}
         dialect = "unknown"
     finally:
         engine.dispose()

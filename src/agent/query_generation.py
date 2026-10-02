@@ -1,18 +1,19 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from e2b_code_interpreter import Sandbox
-from langchain_core.messages import AIMessage
-from typing_extensions import TypedDict
-from typing import Annotated
-from .graph_state import State
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage
+from typing import Annotated
+from typing_extensions import TypedDict
+
+from utils.settings import get_settings
+
+from .graph_state import State
+
+get_settings().apply_to_environment()
 
 llm = init_chat_model("openai:gpt-4.1")
 
 #LEFT TREE NODE
-class QueryOutput(TypedDict):
+class GeneratedQuery(TypedDict):
     """Generated SQL query."""
     query: Annotated[str, ..., "Syntactically valid SQL query."]
 
@@ -91,7 +92,7 @@ def generate_query(state: State):
         "content": prompt
     }
     
-    structured_llm = llm.with_structured_output(QueryOutput)
+    structured_llm = llm.with_structured_output(GeneratedQuery)
     response = structured_llm.invoke([system_message] + state["messages"])
 
     query_message = AIMessage(
@@ -112,7 +113,7 @@ def data_to_sandbox(state: State): #based on data input upload csv or db
         url = state["db_url"].replace("'", "'\\''")  # escape single quotes just in case
         command = f"echo 'DATABASE_URL={url}' > .env"
         sbx.commands.run(command)
-        sbx.commands.run("pip install dotenv")
+        sbx.commands.run("pip install python-dotenv")
         sbx.commands.run("pip install sqlalchemy")
         sbx.commands.run("pip install psycopg2")
         # sbx.commands.run("pip install holoviews bokeh datashader")

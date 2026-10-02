@@ -11,6 +11,7 @@ requires-python = ">=3.9"
 dependencies = [
     "langgraph>=0.2.6",
     "python-dotenv>=1.0.1",
+    "pydantic-settings>=2.0.0",
     "pandas==2.3.2",
     "duckdb>=1.4.0",
     "requests>=2.32.5",
@@ -33,10 +34,13 @@ requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["langgraph.templates.agent", "agent"]
+packages = ["langgraph.templates.agent", "agent", "api", "api.routes", "utils"]
 [tool.setuptools.package-dir]
 "langgraph.templates.agent" = "src/agent"
 "agent" = "src/agent"
+"api" = "src/api"
+"api.routes" = "src/api/routes"
+"utils" = "src/utils"
 
 
 [tool.setuptools.package-data]
