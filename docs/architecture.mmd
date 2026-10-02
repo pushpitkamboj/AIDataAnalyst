@@ -1,0 +1,44 @@
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Inter, ui-sans-serif, system-ui, sans-serif", "primaryColor": "#eef6ff", "primaryTextColor": "#102033", "primaryBorderColor": "#3977ad", "lineColor": "#64748b", "secondaryColor": "#f8fafc", "tertiaryColor": "#f0fdf4"}}}%%
+flowchart LR
+    USER["Browser UI"]
+
+    subgraph API["FastAPI backend"]
+        direction LR
+        UPLOAD["POST /upload<br/>CSV or DB URL"]
+        QUERY["POST /query<br/>question + source"]
+    end
+
+    subgraph AGENT["LangGraph analyst agent"]
+        direction TB
+        ROUTE{"Source type"}
+        METADATA["Extract schema + sample metadata"]
+        INTENT{"Analysis intent"}
+        SQL["Generate + validate SQL"]
+        RUN_SQL["Run query<br/>DuckDB / SQLAlchemy"]
+        CODE["Generate Python chart code"]
+        SANDBOX["Execute chart code in E2B"]
+    end
+
+    OPENAI["OpenAI"]
+    CSV_STORE[("Supabase<br/>CSV bucket")]
+    IMAGE_STORE[("Supabase<br/>image bucket")]
+    RESULT["API response<br/>rows, chart URLs, summary"]
+
+    USER --> UPLOAD
+    USER --> QUERY
+    UPLOAD --> CSV_STORE
+    QUERY --> ROUTE
+    ROUTE --> METADATA
+    METADATA --> INTENT
+    INTENT -->|Tabular| SQL --> RUN_SQL --> RESULT
+    INTENT -->|Visual| CODE --> SANDBOX --> IMAGE_STORE --> RESULT
+    OPENAI -.-> INTENT
+    OPENAI -.-> SQL
+    OPENAI -.-> CODE
+
+    classDef external fill:#fff7ed,stroke:#ea580c,color:#102033;
+    classDef storage fill:#f0fdf4,stroke:#16a34a,color:#102033;
+    classDef decision fill:#fefce8,stroke:#ca8a04,color:#102033;
+    class USER,OPENAI external;
+    class CSV_STORE,IMAGE_STORE storage;
+    class ROUTE,INTENT decision;

@@ -12,25 +12,9 @@ AI Data Analyst is a no-code data analysis app for querying CSV files or databas
 
 ## Architecture
 
-```text
-Browser UI
-  -> FastAPI routes
-     -> /upload stores CSV files in Supabase
-     -> /query invokes the LangGraph analyst agent
-
-LangGraph analyst agent
-  -> routes CSV vs database input
-  -> extracts schema and sample metadata
-  -> classifies request as SQL or visualization
-  -> generates and checks SQL, or generates Python chart code
-  -> executes SQL locally/DuckDB or code in E2B
-  -> returns rows, chart URLs, and summaries
-
-External services
-  -> OpenAI for reasoning and code/query generation
-  -> Supabase for CSV and image storage
-  -> E2B for sandboxed visualization execution
-```
+<p align="center">
+  <img src="docs/architecture.svg" alt="AI Data Analyst architecture diagram">
+</p>
 
 ## Local Setup
 
