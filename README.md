@@ -1,11 +1,3 @@
-# AI Data Analyst
-
-<p align="center">
-  <a href="https://aidataanalyst.pushpitkamboj.com">
-    <img src="https://img.shields.io/badge/AI%20Data%20Analyst-live%20demo-4F46E5?style=for-the-badge" alt="AI Data Analyst live demo"/>
-  </a>
-</p>
-
 <h1 align="center">AI Data Analyst</h1>
 
 <p align="center">
@@ -64,8 +56,6 @@ The product UX is purpose-built for data analysis. Instead of a generic chat upl
 <p align="center">
   <img src="docs/architecture.svg" alt="AI Data Analyst architecture diagram" width="1100">
 </p>
-
-The editable diagram source lives in [`docs/architecture.mmd`](docs/architecture.mmd), and the rendered SVG is generated with Mermaid CLI.
 
 ## Tools And Technologies
 
