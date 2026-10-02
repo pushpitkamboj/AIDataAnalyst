@@ -52,8 +52,15 @@ specifies a specific number of examples they wish to obtain, return all
 Since the data type is csv and we are using duckdb to run the SQL query on csv data, make sure to generate the query in
 the following format:
 EG:     
-    SELECT Country, TotalSpent FROM read_csv_auto({csv_url})
-    MAKE THIS EXTRA  PIECE `read_csv_auto({csv_url})` AS A TABLE NAME IN THE QUERY, SO THE QUERY CAN BE EXECUTED USING DUCKDB
+    SELECT Country, TotalSpent FROM read_csv_auto('{csv_url}')
+    MAKE THIS EXTRA PIECE `read_csv_auto('{csv_url}')` AS A TABLE NAME IN THE QUERY, SO THE QUERY CAN BE EXECUTED USING DUCKDB
+
+DuckDB-specific SQL rules:
+- Use DuckDB syntax, not MySQL, Postgres, or SQLite syntax.
+- For relative dates use `CURRENT_DATE - INTERVAL '2 months'`, `CURRENT_DATE - INTERVAL '30 days'`, etc.
+- Do not use `date_sub('month', 2, CURRENT_DATE)` or `DATE(...)` with multiple arguments.
+- If a CSV date column is stored as text in ISO format, cast it with `CAST("Date Raised" AS DATE)`.
+- Quote column names with spaces using double quotes, for example `"Date Raised"`.
 
 You can order the results by a relevant column to return the most interesting
 examples in the database.

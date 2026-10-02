@@ -57,5 +57,5 @@ def extract_csv_info(state: State):
     return {
         "messages": [response],
         "schema_context": data,
-        "dialect": "sqlite", #because the docs of DuckDB say they mimic exactly the sqlite
+        "dialect": "duckdb",
     }

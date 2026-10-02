@@ -114,6 +114,12 @@ Double check the {dialect} query for common mistakes, including:
 - Using the correct number of arguments for functions
 - Casting to the correct data type
 - Using the proper columns for joins
+- If the dialect is duckdb, use DuckDB date arithmetic such as
+  `CURRENT_DATE - INTERVAL '2 months'`.
+- If the dialect is duckdb, do not use MySQL-style
+  `date_sub('month', 2, CURRENT_DATE)` or multi-argument `DATE(...)`.
+- If the dialect is duckdb and a CSV date column is text, cast ISO date
+  strings with `CAST("Date Raised" AS DATE)`.
 
 If there are any of the above mistakes, rewrite the query. If there are no mistakes,
 just reproduce the original query.
