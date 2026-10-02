@@ -21,3 +21,4 @@ class State(TypedDict):
     code_status: bool
     code_error: str
     query_error: str
+    retry_count: int

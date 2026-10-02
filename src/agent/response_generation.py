@@ -13,15 +13,33 @@ get_settings().apply_to_environment()
 llm = init_chat_model("openai:gpt-4.1")
 def generate_answer_query(state: State):
     """Answer question using retrieved information as context."""
+    if state.get("query_error"):
+        return {
+            "result": [
+                {
+                    "error": "Unable to execute the generated SQL after retries.",
+                    "details": state["query_error"],
+                    "query": state.get("query"),
+                }
+            ]
+        }
     # query = state["query"]
     # prompt = (
     #     f"analyze the query: {query} and give an insightful 1 line statement. do not give info like run on this using duckdb or whatever, just think the outcome of query is something and u get back"
     # )
     # response = llm.invoke(prompt)
-    return {"result": state["sql_query_output"]}
+    return {"result": state.get("sql_query_output", [])}
 
 
 def generate_answer_viz(state: State):
+    if state.get("code_error"):
+        return {
+            "result": (
+                "Unable to generate the visualization after retries. "
+                f"Last error: {state['code_error']}"
+            )
+        }
+
     model = init_chat_model(model="gpt-4o")
     urls = state.get("image_urls")
     if not urls:

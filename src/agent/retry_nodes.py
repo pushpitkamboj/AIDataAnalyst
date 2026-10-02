@@ -10,7 +10,8 @@ get_settings().apply_to_environment()
 
 llm = init_chat_model(model="gpt-4o-mini")
 
-MAX_RETRIES = 3
+MAX_QUERY_RETRIES = 3
+MAX_CODE_RETRIES = 3
 
 class CorrectedCode(BaseModel):
     code: str
@@ -76,7 +77,7 @@ def should_retry_query(state: State) -> str:
     """Decide whether to retry query or give up."""
     retry_count = state.get("retry_count", 0)
     query_error = state.get("query_error")
-    if query_error and retry_count < MAX_RETRIES:
+    if query_error and retry_count < MAX_QUERY_RETRIES:
         return "fix_query"
     elif query_error:
         return "generate_answer_query"  # Give up, return error in answer
@@ -85,7 +86,8 @@ def should_retry_query(state: State) -> str:
 
 def should_retry_code(state: State) -> str:
     """Decide whether to retry code or give up."""
+    retry_count = state.get("retry_count", 0)
     code_error = state.get("code_error")
-    if code_error:
+    if code_error and retry_count < MAX_CODE_RETRIES:
         return "fix_code"
     return "generate_answer_viz"
