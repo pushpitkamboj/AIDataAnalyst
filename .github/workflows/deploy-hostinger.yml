@@ -7,7 +7,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   PROJECT_NAME: aidataanalyst
-  DOMAIN: aidataanalyst.pushpitkamboj.com
 
 jobs:
   deploy:
@@ -64,28 +63,18 @@ jobs:
                 IMAGE_BUCKET_NAME: ${IMAGE_BUCKET_NAME:-data_image}
                 LOG_LEVEL: ${LOG_LEVEL:-INFO}
 
-            caddy:
-              image: caddy:2-alpine
-              restart: unless-stopped
-              depends_on:
-                - aidataanalyst
-              ports:
-                - "80:80"
-                - "443:443"
-              command: caddy reverse-proxy --from ${DOMAIN} --to aidataanalyst:8000
-              volumes:
-                - caddy_data:/data
-                - caddy_config:/config
+              networks:
+                - proxy
 
-          volumes:
-            caddy_data:
-            caddy_config:
+          networks:
+            proxy:
+              name: vps_proxy
+              external: true
           COMPOSE
           )"
           CONTENT="${CONTENT/__IMAGE__/$IMAGE}"
 
           ENVIRONMENT="$(cat <<ENV
-          DOMAIN=${DOMAIN}
           OPENAI_API_KEY=${OPENAI_API_KEY}
           E2B_API_KEY=${E2B_API_KEY}
           SUPABASE_URL=${SUPABASE_URL}
